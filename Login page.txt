@@ -1,0 +1,490 @@
+LOGIN/CREATE ACCOUNT:
+package bloodbankprojectfinal;
+
+import java.awt.Button;
+import java.awt.Color;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.Frame;
+import java.awt.Label;
+import java.awt.TextField;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
+class login extends JFrame{
+    JLabel user,pass;
+    private int count=0;
+    JTextField t1;
+    JPasswordField t2;
+    JButton b1,b2;
+    ImageIcon BackGroundImage;
+    login(){
+        setLayout(new BorderLayout());
+        setContentPane(new JLabel(new ImageIcon("D:\\login4.jpg")));
+        setLayout(new FlowLayout());
+        setSize(500,500);
+        setSize(499,499);
+        setLayout(null);
+        user=new JLabel("USERNAME");
+         user.setForeground(Color.black);
+         user.setFont(new Font( Font.DIALOG, Font.BOLD, 18));
+  	pass=new JLabel("PASSWORD");
+         pass.setForeground(Color.black);
+         pass.setFont(new Font( Font.DIALOG, Font.BOLD, 18));
+
+  	t1=new JTextField();
+  	t2=new JPasswordField();
+
+  	//t2.setEchoChar('*');
+
+  	b1=new JButton("LOGIN");
+         b1.setFont(new Font( Font.DIALOG, Font.BOLD, 18));
+         b1.setBackground(Color.lightGray);
+         b2=new JButton("CREATE ACCOUNT");
+         b2.setFont(new Font( Font.DIALOG, Font.BOLD, 18));
+         b2.setBackground(Color.lightGray);
+
+        b1.addActionListener(new ActionListener(){
+         public void actionPerformed(ActionEvent e){
+              
+               try {	
+                   boolean flag=true;
+		    String user_id=t1.getText();
+		    String pa=t2.getText();
+                    if(user_id.equals("") && pa.equals(""))
+                 {
+                     JOptionPane.showMessageDialog(null,"Please enter username and Password");
+                    
+                     flag=false;
+                     return;
+                 }
+                 else if(!(user_id.equals(""))&& pa.equals(""))
+                 {
+                     JOptionPane.showMessageDialog(null,"Please enter password");
+                     flag=false;
+                     return;
+                 }
+                 else if(user_id.equals("")&& (!pa.equals("")))
+                 {
+                     JOptionPane.showMessageDialog(null,"Please enter username");
+                     flag=false;
+                     return;
+                 }
+		    String query="select passwords from  user_details where u_mail_id=?";
+                    Connection con = JavaBean.login.getConnection();
+            PreparedStatement pstmt=con.prepareStatement(query);
+              pstmt.setString(1, user_id);
+					
+            ResultSet rs=pstmt.executeQuery();
+            String result="";
+            while(rs.next())
+            {
+                result=rs.getString("passwords");
+                
+            }
+            if(flag){
+	    if(pa.equals(result)){
+             setVisible(false);
+	    new Home(user_id);
+            }
+            
+	    else{
+		JOptionPane.showMessageDialog(null, "INCORRECT USERNAME OR PASSWORD");
+	        dispose();
+		setVisible(true);
+                t1.setText("");
+                t2.setText("");
+	    }	
+            }
+           
+	    con.close();
+                    
+					
+	  } catch (Exception e1) {
+					
+		JOptionPane.showMessageDialog(null, "-->"+e1);
+		setVisible(false);
+		dispose();
+		}
+          }
+            
+        });
+        b2.addActionListener(new ActionListener(){
+            
+            public void actionPerformed(ActionEvent e) {
+                setVisible(false);
+                new registerform ();
+            }
+            
+        });
+
+  	user.setBounds(250,280,150,60);
+  	pass.setBounds(250,350,150,60);
+
+  	t1.setBounds(370,300,300,25);
+  	t2.setBounds(370,370,300,25);
+
+  	b1.setBounds(290,450,100,35);
+        b2.setBounds(400,450,250,35);
+        
+
+        
+  	add(user);
+  	add(pass);
+         
+  	add(t1);
+  	add(t2);
+
+  	add(b1);
+        add(b2);
+         JLabel title=new JLabel("BLOOD BANK PORTAL");
+       title.setBounds(240, 70, 380, 25);
+       title.setForeground(Color.red);
+        title.setFont(new Font( Font.DIALOG, Font.BOLD, 30));
+        add(title);
+
+  	setSize(800,800);
+//  	setBackground(Color.pink);
+        setResizable(false);
+        setVisible(true);
+        
+    }
+}
+
+class loginform{
+    public static void main(String ss[]) throws Exception{
+        new login();
+    }
+}
+
+USER REGISTRATION:
+package bloodbankprojectfinal;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.ItemSelectable;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Statement;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPasswordField;
+
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
+
+public class registerform extends JFrame implements ActionListener,ItemListener{
+    private int count=0;
+    JLabel lbl_fname,lbl_lname,lbl_mobile,lbl_email,lbl_gender,lbl_blood_group;
+     JComboBox jcb_bloodgroup;
+    JLabel Password;
+    JLabel Confirm_Password;
+    JTextField txt_fname,txt_lname,txt_email,txt_mobile;
+    JPasswordField txt_Password;
+    JPasswordField txt_confirmpassword;
+    ButtonGroup btngroup;
+    JRadioButton rdb_male,rdb_female,rdb_others;
+    ImageIcon BackGround;
+    
+    
+    JButton Register;
+      JButton Reset;
+        JButton Exit;
+    Container co;
+    String str_gender="";
+    public registerform (){
+          setLayout(new BorderLayout());
+        setContentPane(new JLabel(new ImageIcon("D:\\bg5.png")));
+        setLayout(new FlowLayout());
+        setSize(1000,1000);
+        setSize(999,999);
+        co=getContentPane();
+        co.setLayout(null);
+        
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
+        lbl_fname=new JLabel("FIRST NAME");
+        lbl_fname.setForeground(Color.white);
+         lbl_fname.setFont(new Font( Font.DIALOG, Font.BOLD, 18));
+         
+        lbl_lname=new JLabel("LAST NAME");
+        lbl_lname.setForeground(Color.white);
+         lbl_lname.setFont(new Font( Font.DIALOG, Font.BOLD, 18));
+         
+        lbl_mobile= new JLabel("MOBILE");
+        lbl_mobile.setForeground(Color.white);
+        lbl_mobile.setFont(new Font( Font.DIALOG, Font.BOLD, 18));
+        
+         
+        lbl_email=new JLabel("EMAIL-ID");
+        lbl_email.setForeground(Color.white);
+        lbl_email.setFont(new Font( Font.DIALOG, Font.BOLD, 18));
+        
+        lbl_gender=new JLabel("GENDER");
+        lbl_gender.setForeground(Color.white);
+         lbl_gender.setFont(new Font( Font.DIALOG, Font.BOLD, 18));
+        
+         lbl_blood_group=new JLabel("BLOOD GROUP");
+       lbl_blood_group.setForeground(Color.white);
+       lbl_blood_group.setFont(new Font( Font.DIALOG, Font.BOLD, 15));
+       
+        Password=new JLabel("PASSWORD");
+        Password.setForeground(Color.white);
+        Password.setFont(new Font( Font.DIALOG, Font.BOLD, 18));
+        
+        Confirm_Password=new JLabel("CONFIRM PASSWORD");
+       Confirm_Password.setForeground(Color.white);
+        Confirm_Password.setFont(new Font( Font.DIALOG, Font.BOLD, 15));
+        
+        
+       
+       
+        txt_fname=new JTextField();
+        txt_lname=new JTextField();
+        
+        txt_mobile=new JTextField();
+        txt_email=new JTextField();
+        jcb_bloodgroup=new JComboBox();
+        jcb_bloodgroup.addItem("--SELECT--");
+       jcb_bloodgroup.addItem("O+");
+        jcb_bloodgroup.addItem("A+");
+        jcb_bloodgroup.addItem("B+");
+        jcb_bloodgroup.addItem("O-");
+        jcb_bloodgroup.addItem("A-");
+        jcb_bloodgroup.addItem("B-");
+        jcb_bloodgroup.addItem("AB+");
+        jcb_bloodgroup.addItem("AB-");
+
+        btngroup=new ButtonGroup();
+
+        rdb_male=new JRadioButton("male");
+        rdb_female=new JRadioButton("female");
+        rdb_others=new JRadioButton("others");
+        
+        
+
+        btngroup.add(rdb_male);
+        btngroup.add(rdb_female);
+        btngroup.add(rdb_others);
+        txt_Password=new JPasswordField();
+         txt_confirmpassword=new JPasswordField();
+        Register=new JButton("REGISTER");
+        Reset=new JButton("RESET");
+        Exit=new JButton("EXIT");
+
+        rdb_male.addItemListener(this);
+        rdb_female.addItemListener(this);
+        rdb_others.addItemListener(this);
+        Register.addActionListener(this);
+        Reset.addActionListener(this);
+        Exit.addActionListener(this);
+       JLabel title=new JLabel("CREATE AN ACCOUNT");
+       title.setBounds(140, 70, 320, 25);
+       title.setForeground(Color.white);
+        title.setFont(new Font( Font.DIALOG, Font.BOLD, 26));
+
+      
+        lbl_fname.setBounds(100, 150, 120, 25);
+        lbl_lname.setBounds(100, 200, 120, 25);
+        
+        
+        lbl_mobile.setBounds(100,250,150,25);
+        lbl_email.setBounds(100,300,120,25);
+        lbl_blood_group.setBounds(100,350,120,25);
+        lbl_gender.setBounds(100, 400, 150, 25);
+        Password.setBounds(100, 450, 120, 25);
+        Confirm_Password.setBounds(50,500,180,32);
+        
+        
+        Register.setBounds(100, 550, 120, 25);
+        Reset.setBounds(230,550,120,25);
+        
+        Exit.setBounds(370,550,120,25);
+        
+
+
+        
+        txt_fname.setBounds(230, 150, 120, 25);
+        txt_lname.setBounds(230, 200, 120, 25);
+        
+        txt_mobile.setBounds(230, 250, 120, 25);
+        txt_email.setBounds(230, 300, 120, 25);
+        jcb_bloodgroup.setBounds(230,350,120, 25);
+        rdb_male.setBounds(230, 400, 60, 25);
+        rdb_female.setBounds(290, 400, 70, 25);
+        rdb_others.setBounds(360,400,70,25);
+        txt_Password.setBounds(230, 450, 120, 25);
+        txt_confirmpassword.setBounds(230,500,120,25);
+        
+
+        co.add(title);
+        co.add(lbl_fname);
+        co.add(lbl_lname);
+        
+        co.add(lbl_mobile);
+        co.add(lbl_email);
+        co.add(lbl_blood_group);
+        co.add(lbl_gender);
+        co.add(Password);
+        co.add(Confirm_Password);
+
+        
+        co.add(txt_fname);
+        co.add(txt_lname);
+        
+        
+        co.add(txt_mobile);
+        co.add(txt_email);
+        co.add(jcb_bloodgroup);
+        co.add(rdb_male);
+        co.add(rdb_female);
+        co.add(rdb_others);
+        co.add(txt_Password);
+        co.add(txt_confirmpassword);
+        co.add(Register);
+        co.add(Reset);
+        co.add(Exit);
+        
+        setSize(800, 800);
+        
+        setVisible(true);
+        
+    }
+
+    public void itemStateChanged(ItemEvent ie){
+
+        ItemSelectable itemselected=ie.getItemSelectable();
+
+        if(itemselected==rdb_male){
+                str_gender="m";
+        }
+        else if(itemselected==rdb_female){
+                str_gender="f";
+        }
+        else
+        {
+            str_gender="o";
+        }
+    }
+     
+
+    public void actionPerformed(ActionEvent ae){
+
+        Object obj_source=ae.getSource();
+        if(obj_source==Reset){
+             txt_fname.setText("");
+             txt_lname.setText("");
+             txt_mobile.setText("");
+             txt_email.setText("");
+             btngroup.clearSelection();
+             jcb_bloodgroup.setSelectedIndex(0);
+             txt_Password.setText("");
+             txt_confirmpassword.setText("");
+             
+         }
+         if(obj_source==Exit){
+             
+             setVisible(false);
+         }
+
+        if(obj_source==Register){
+
+            try{
+                
+                String str_fname=txt_fname.getText();
+                String str_lname=txt_lname.getText();
+            
+                
+                String str_mobile=txt_mobile.getText();
+                String str_email=txt_email.getText();
+                String str_blood_group=jcb_bloodgroup.getSelectedItem().toString();
+                
+                String str_password=txt_Password.getText();
+                String str_Confirm_Password=txt_confirmpassword.getText();
+                
+                if(!str_password.equals(str_Confirm_Password))
+                {
+                    JOptionPane.showMessageDialog(this,"Password does not match correctly");
+                    count++;
+                }
+                
+if(!Pattern.matches("^(.+)@(.+)$",str_email)){
+ JOptionPane.showMessageDialog(this,"Invalid Email");
+ count++;
+ }
+ else if(str_gender==null){
+ JOptionPane.showMessageDialog(this,"Please select your Gender");
+ count++;
+ }
+ else if(!Pattern.matches("[789][0-9]{9}+",str_mobile)){
+     JOptionPane.showMessageDialog(this,"Invalid mobile number");
+     count++;
+ }
+ else if(!Pattern.matches("^[a-zA-Z0-9][a-zA-Z0-9]*.{8,32}$",str_password)){
+ JOptionPane.showMessageDialog(this,"Your Password must contain atleast 8 characters(Ex:19Euit170@)");
+ count++;
+ }
+ 
+
+             Connection con = JavaBean.login.getConnection();
+
+           Statement stmt=con.createStatement();
+        if(count==0){
+           String query="insert into user_details values('"+str_fname+"','"+str_lname+"','"+str_mobile+"','"+str_email+"','"+str_gender+"','"+str_blood_group+"','"+str_password+"','"+str_Confirm_Password+"')";
+
+
+           stmt.executeUpdate(query);
+           con.setAutoCommit(true);
+        
+ 
+ 
+           JOptionPane.showMessageDialog(this, "Registration success!");
+           new SendMailSSL(str_email,"user_registration");
+           setVisible(false);
+           new login();
+           
+        }         
+                   
+            }
+            catch(Exception ex){
+                JOptionPane.showMessageDialog(this, ex.toString());
+            }
+
+        }
+    }
+            
+
+    public static void main(String args[]){
+        registerform  RegForm1=new registerform ();
+        RegForm1.setPreferredSize(new Dimension(800,800));
+        RegForm1.getContentPane().setBackground(Color.black);
+        
+        RegForm1.pack();
+        RegForm1.setVisible(true);
+    }
+}

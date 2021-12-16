@@ -1,0 +1,79 @@
+MAIL CLASS:
+
+package bloodbankprojectfinal;
+
+
+
+import java.util.Properties;
+import javax.mail.Authenticator;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+
+public class SendMailSSL {
+
+	SendMailSSL(String mailid ,String type ) {
+
+
+
+		final String username = "19euit170@skcet.ac.in";
+		final String password = "skcet@170";
+
+                final String from = "19euit170@skcet.ac.in";
+                final String to = mailid;
+
+		Properties props = new Properties();
+
+		props.put("mail.smtp.host", "smtp.gmail.com");
+		props.put("mail.smtp.socketFactory.port", "465");
+		props.put("mail.smtp.socketFactory.class","javax.net.ssl.SSLSocketFactory");
+		props.put("mail.smtp.auth", "true");
+		props.put("mail.smtp.port", "465");
+
+
+
+                
+                Authenticator a =new Authenticator() {
+
+                    @Override
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        
+                        return new PasswordAuthentication(username, password);
+                        
+                    }
+                    
+                };
+
+                Session session = Session.getInstance(props, a);
+
+		try {
+
+			Message message = new MimeMessage(session);
+
+			message.setFrom(new InternetAddress(from));
+
+			message.setRecipients(Message.RecipientType.TO,InternetAddress.parse(to));
+                                          if(type.equals("user_registration"))
+                                          {
+			message.setSubject("Confirmation Mail");
+			message.setText("You have been Successfully registered as a User in our Blood Bank Portal!");
+                                          }
+                                          
+                                          else if(type.equals("donor_registration"))
+                                          {
+			message.setSubject(" Donor Confirmation Mail");
+			message.setText("You have been Successfully registered as a Donor in our Blood Bank Portal!");
+                                          }
+			Transport.send(message);
+
+			System.out.println("Done");
+
+		} catch (MessagingException e) {
+			System.out.println(e);
+		}
+	}
+}

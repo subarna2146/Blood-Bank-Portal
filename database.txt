@@ -1,0 +1,18 @@
+create database db1;
+use db1;
+create table user_details(u_first_name varchar(20) NOT NULL,u_last_name varchar(20) NOT NULL,u_mobile_no varchar(10) NOT NULL,u_mail_id varchar(50) NOT NULL,sex varchar(10),u_blood_group varchar(3) NOT NULL,passwords varchar(20),confirm_password varchar(20),primary key(u_mail_id));
+create table blood_stock(
+blood_s_no int,
+b_blood_type varchar(4) NOT NULL,
+b_quantity int NOT NULL,
+PRIMARY KEY(blood_s_no) );
+insert into blood_stock values(1,"A+",0);
+insert into blood_stock values(2,"B+",0);
+insert into blood_stock values(3,"A-",0);
+insert into blood_stock values(4,"B-",0);
+insert into blood_stock values(5,"AB+",0);
+insert into blood_stock values(6,"AB-",0);
+insert into blood_stock values(7,"O+",0);
+insert into blood_stock values(8,"O-",0);
+ create table donor_details(d_number int NOT NULL,d_mail_id varchar(50) NOT NULL,d_age int NOT NULL,d_blood_group varchar(3) NOT NULL,d_weight int NOT NULL,d_city varchar(20) NOT NULL,d_address varchar(100) NOT NULL,primary key(d_number),CONSTRAINT FK_mail_id FOREIGN KEY (d_mail_id)REFERENCES user_details(u_mail_id));
+   create table all_donations(a_donation_no int NOT NULL,a_donor_no int NOT NULL,a_date date NOT NULL,a_location varchar (20),a_quantity int,a_blood_type varchar(4) ,primary key(a_donation_no),CONSTRAINT FK_donor_no FOREIGN KEY (a_donor_no)REFERENCES donor_details(d_number));
